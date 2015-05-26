@@ -1,11 +1,11 @@
-# redcurrant-librain
+# Librain
 
-jerasure wrapper for Redcurrant's erasure code.
+Jerasure wrapper as a Erasure code library for [OpenIO](http://openio.io) [Software Defined Storage](https://github.com/open-io/oio-sds) solution.
 
 ## Dependencies
 
-* https://bitbucket.org/jimplank/gf-complete
-* https://bitbucket.org/jimplank/jerasure
+* http://lab.jerasure.org/jerasure/gf-complete
+* http://lab.jerasure.org/jerasure/jerasure
 
 ## Installation
 

@@ -1,3 +1,11 @@
+/* Librain, an erasure code library.
+ * Copyright (C) 2011 Worldline, original work.
+ * Copyright (C) 2015 OpenIO, modified as part of its software defined storage solution.
+ * All rights reserved.
+ *
+ * This software may be modified and distributed under the terms
+ * of the BSD license.  See the LICENSE file for details.
+ */
 #ifndef LIBRAIN_test_utils_h
 # define LIBRAIN_test_utils_h 1
 
