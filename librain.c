@@ -179,6 +179,11 @@ rain_rehydrate(uint8_t **data, uint8_t **coding,
 		}
 	}
 
+	// If data is empty, we needn't to rebuilt chunks, they are empty.
+	// Previous loop allocates empty buffers so nothing to do.
+	if (enc->data_size == 0) {
+		return 1;
+	}
 	int res = rain_rehydrate_noalloc(enc, data, coding, erasures);
 
 	/* On error, cleanup missing parts */
@@ -249,6 +254,14 @@ rain_encode (uint8_t *rawdata, size_t rawlength,
 	uint8_t *parity [encoding->m];
 	for (unsigned int i=0; i < encoding->m; ++i)
 		parity[i] = (uint8_t*) env->calloc(sizeof(uint8_t), encoding->block_size);
+
+	// If data is empty, parity chunks are empty too.
+	// Previous loop allocates empty buffers so nothing to do.
+	if (encoding->data_size == 0) {
+		for (unsigned int i=0; i < encoding->m; ++i)
+			out[i] = parity[i];
+		return 1;
+	}
 
 	// Prepare the data blocks (no copy, point to the original)
 	uint8_t *data [encoding->k];

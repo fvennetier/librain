@@ -231,7 +231,7 @@ main(int argc, char **argv)
 			test_sizes_around (length, "crs", k, 4);
 	}
 
-	for (int size = 1; size < 5555; size += 7) {
+	for (int size = 0; size < 5555; size += 7) {
 		test_roundtrip (size, "crs", 6, 2);
 		test_roundtrip (size, "liber8tion", 6, 2);
 	}
