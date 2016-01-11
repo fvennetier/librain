@@ -31,12 +31,12 @@ test_size (size_t length, const char *algo, unsigned int k, unsigned int m)
 
 	if (rain_get_encoding (&enc, length, k, m, algo)) {
 		double overhead = (double)((k+m)*enc.block_size) / (double) enc.data_size;
-		PRINTF ("SIZE %s %u+%u W=%u PS=%lu s=%lu DS=%lu PDS=%lu BS=%lu %f\n",
+		PRINTF ("SIZE %s %u+%u W=%u PS=%zu s=%zu DS=%zu PDS=%zu BS=%zu %f\n",
 				algo, k, m , enc.w, enc.packet_size, enc.strip_size,
 				enc.data_size, enc.padded_data_size, enc.block_size,
 				overhead);
 	} else {
-		PRINTF ("SIZE %s %u+%u W=%u PS=%lu s=%lu DS=%lu PDS=%lu BS=%lu -\n",
+		PRINTF ("SIZE %s %u+%u W=%u PS=%zu s=%zu DS=%zu PDS=%zu BS=%zu -\n",
 				algo, k, m , enc.w, enc.packet_size, enc.strip_size,
 				enc.data_size, enc.padded_data_size, enc.block_size);
 	}
@@ -82,11 +82,11 @@ test_encoding (size_t length, const char *algo, unsigned int k, unsigned int m)
 	}
 
 	if (!rc) {
-		PRINTF("ENC %s %u+%u DS=%lu - -\n", algo, k, m, enc.data_size);
+		PRINTF("ENC %s %u+%u DS=%zu - -\n", algo, k, m, enc.data_size);
 	} else {
 		size_t elapsed = _elapsed_msec (pre, post);
 		double throughput = ((double) enc.data_size / (double) elapsed) * 1000.0;
-		PRINTF("ENC %s %u+%u DS=%lu %lu %f\n",
+		PRINTF("ENC %s %u+%u DS=%zu %zu %f\n",
 				algo, k, m, enc.data_size, elapsed, throughput / (double)GiB);
 	}
 }
@@ -110,7 +110,7 @@ test_rehydrate (struct rain_encoding_s *enc, uint8_t **data, uint8_t **parity,
 		}
 	}
 
-	PRINTF ("REHYDRATE %s %u %u lost=%u %lu", _algo_to_str(enc->algo),
+	PRINTF ("REHYDRATE %s %u %u lost=%u %zu", _algo_to_str(enc->algo),
 			enc->k, enc->m, count_deleted, enc->data_size);
 
 	struct timespec pre, post;
@@ -121,7 +121,7 @@ test_rehydrate (struct rain_encoding_s *enc, uint8_t **data, uint8_t **parity,
 
 	size_t elapsed = _elapsed_msec (pre, post);
 	double throughput = (((double)enc->data_size) / (double)elapsed) * 1000.0;
-	PRINTF(" %lu %f\n", elapsed, throughput);
+	PRINTF(" %zu %f\n", elapsed, throughput);
 
 	// Check the restored blocks are identical to the originals
 	for (unsigned int i=0; i<count_deleted ;++i) {
