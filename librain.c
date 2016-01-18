@@ -39,7 +39,7 @@ _encoding_from_packet_size(struct rain_encoding_s *enc, size_t p_size)
 static int
 encoding_prepare (struct rain_encoding_s *enc,
 		const char *algo, unsigned int k, unsigned int m,
-		size_t length)
+		size_t length, int optimize_size)
 {
 	assert(algo != NULL);
 	assert(k > 0);
@@ -81,8 +81,16 @@ encoding_prepare (struct rain_encoding_s *enc,
 		enc->w = 4;
 	}
 
+	if (!optimize_size) {
+		/* This will generate chunks of at least 8192 bytes in CRS and 16384
+		 * bytes in liber8tion so it's not efficient for small contents. */
+		_encoding_from_packet_size(enc, 2048);
+		return 1;
+	}
+
 	if (enc->data_size > 0) {
-		// Retry with intermediate values (this loop can be optimized)
+		/* Try to find a packet size that will fit our data size and avoid
+		 * using padding (this loop can probably be optimized). */
 		for (size_t start = 2048; start >= 1280; start -= 256) {
 			for (size_t p_size = start; p_size >= 64; p_size /= 2) {
 				_encoding_from_packet_size(enc, p_size);
@@ -107,7 +115,7 @@ rain_get_encoding (struct rain_encoding_s *encoding, size_t rawlength,
 		unsigned int k, unsigned int m, const char *algo)
 {
 	assert(encoding != NULL);
-	return encoding_prepare(encoding, algo, k, m, rawlength);
+	return encoding_prepare(encoding, algo, k, m, rawlength, 0);
 }
 
 static int
@@ -352,7 +360,7 @@ rain_get_coding_chunks(uint8_t *data, size_t length,
 		return NULL;
 
 	struct rain_encoding_s encoding;
-	if (!encoding_prepare(&encoding, algo, k, m, length))
+	if (!encoding_prepare(&encoding, algo, k, m, length, 0))
 		return NULL;
 
 	uint8_t *out[m];
@@ -370,7 +378,7 @@ rain_repair_and_get_raw_data(uint8_t **data, uint8_t **coding,
 		const char* algo)
 {
 	struct rain_encoding_s enc;
-	if (!encoding_prepare(&enc, algo, k, m, rawlength))
+	if (!encoding_prepare(&enc, algo, k, m, rawlength, 0))
 		return EXIT_FAILURE;
 	int rc = rain_rehydrate(data, coding, &enc, &env_DEFAULT);
 	return MACRO_COND(rc!=0,EXIT_SUCCESS,EXIT_FAILURE);
@@ -390,7 +398,7 @@ get_chunk_size(int length, int k, int m, const char* algo)
 	struct rain_encoding_s enc;
 	if (length < 0 || k < 0 || m < 0)
 		return -1;
-	if (!encoding_prepare(&enc, algo, k, m, length))
+	if (!encoding_prepare(&enc, algo, k, m, length, 0))
 		return -1;
 	return enc.block_size;
 }
